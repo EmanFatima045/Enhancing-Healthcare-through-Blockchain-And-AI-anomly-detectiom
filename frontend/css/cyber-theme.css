@@ -1,0 +1,155 @@
+/* =========================================================
+   HEALERPLUS 2.0 - CYBER THEME & GLASSMORPHISM AESTHETICS
+   ========================================================= */
+
+/* Glow classes */
+.glow-cyan {
+  border-color: var(--border-cyan) !important;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.12);
+}
+
+.glow-purple {
+  border-color: var(--border-purple) !important;
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.12);
+}
+
+.glow-red {
+  border-color: var(--border-red) !important;
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.15);
+}
+
+.glow-green {
+  border-color: rgba(0, 245, 160, 0.3) !important;
+  box-shadow: 0 0 20px rgba(0, 245, 160, 0.12);
+}
+
+.glow-blue {
+  border-color: rgba(79, 172, 254, 0.3) !important;
+  box-shadow: 0 0 20px rgba(79, 172, 254, 0.12);
+}
+
+/* Text Colors */
+.text-cyan { color: var(--accent-cyan) !important; }
+.text-blue { color: var(--accent-blue) !important; }
+.text-purple { color: var(--accent-purple) !important; }
+.text-red { color: var(--accent-red) !important; }
+.text-green { color: var(--accent-green) !important; }
+.text-orange { color: var(--accent-orange) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.font-mono { font-family: var(--font-mono) !important; }
+
+/* Pulse Dots */
+.pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.pulse-dot.green {
+  background-color: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+}
+
+.pulse-dot.green::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-green);
+  animation: ripple 1.6s infinite ease-out;
+}
+
+.pulse-dot.red {
+  background-color: var(--accent-red);
+  box-shadow: 0 0 8px var(--accent-red);
+}
+
+.pulse-dot.red::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-red);
+  animation: ripple 1.2s infinite ease-out;
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Badge Chips */
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.badge-chip.green {
+  background: rgba(0, 245, 160, 0.12);
+  border: 1px solid rgba(0, 245, 160, 0.35);
+  color: var(--accent-green);
+}
+
+.badge-chip.red {
+  background: rgba(255, 51, 102, 0.15);
+  border: 1px solid var(--border-red);
+  color: var(--accent-red);
+}
+
+.badge-chip.purple {
+  background: rgba(157, 78, 221, 0.15);
+  border: 1px solid var(--border-purple);
+  color: var(--accent-purple);
+}
+
+.badge-chip.blue {
+  background: rgba(79, 172, 254, 0.15);
+  border: 1px solid rgba(79, 172, 254, 0.35);
+  color: var(--accent-blue);
+}
+
+.tab-chip {
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.tab-chip.red {
+  background: rgba(255, 51, 102, 0.2);
+  color: var(--accent-red);
+  border: 1px solid var(--border-red);
+}
+
+.tab-chip.green {
+  background: rgba(0, 245, 160, 0.2);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 245, 160, 0.4);
+}
+
+.status-indicator-live {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-cyan);
+  background: rgba(0, 242, 254, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-cyan);
+}

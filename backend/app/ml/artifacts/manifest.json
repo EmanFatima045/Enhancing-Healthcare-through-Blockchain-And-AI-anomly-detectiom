@@ -1,0 +1,5 @@
+{
+  "artifact": "application_detector.joblib",
+  "report": "evaluation.json",
+  "schema": "schema.json"
+}

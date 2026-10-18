@@ -1,0 +1,82 @@
+{
+  "evaluation_status": "FINAL_HELD_OUT_TOY_FIXTURE",
+  "warning": "Tiny synthetic fixture; results do not establish deployment generalization.",
+  "model_version": "application-random_forest-v1",
+  "schema_version": "application-security-v1",
+  "dataset_checksums": {
+    "source": "d3a41a49fbd0bd85133bf5198b386732291adf348d6a827fb9c90674ec9cb24f",
+    "test": "61b9b7f645ed6e9ddcdd5dc1e26529f00e47c1398504cffaac61651936c64649"
+  },
+  "seed": 42017,
+  "versions": {
+    "python": "3.11.6",
+    "sklearn": "1.7.2",
+    "numpy": "2.3.3",
+    "pandas": "3.0.1"
+  },
+  "hardware": {
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "platform": "Windows-10-10.0.26200-SP0"
+  },
+  "class_support": {
+    "0": 2,
+    "1": 2,
+    "2": 2,
+    "3": 2
+  },
+  "macro_f1": 1.0,
+  "per_class": {
+    "0": {
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "1": {
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "2": {
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "3": {
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      2,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      2,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      2
+    ]
+  ],
+  "binary_attack_pr_auc": 1.0,
+  "false_positive_rate": 0.0,
+  "threshold": 0.965,
+  "score_direction": "higher attack_score means greater estimated attack risk",
+  "inference_latency_ms": {
+    "batch_total": 12.397,
+    "p50": 12.18135,
+    "p95": 13.49513
+  }
+}

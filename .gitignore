@@ -1,0 +1,16 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+frontend/node_modules/
+contracts/node_modules/
+blockchain/node_modules/
+blockchain/artifacts/
+blockchain/cache/
+blockchain/typechain-types/
+backend/app/ml/work/
+datasets/ciciomt2024/raw/
+datasets/ciciomt2024/prepared/
+frontend/dist/
+*.db-shm
+*.db-wal

@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: healerplus
+      POSTGRES_USER: healerplus
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - healerplus_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healerplus"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      HEALER_SECRET_KEY: ${HEALER_SECRET_KEY:?set HEALER_SECRET_KEY}
+      HEALER_ENV: production
+      HEALER_DEMO_MODE: "false"
+      DATABASE_URL: postgresql+psycopg://healerplus:${POSTGRES_PASSWORD}@db:5432/healerplus
+      HEALER_CORS_ORIGINS: ${HEALER_CORS_ORIGINS:-http://127.0.0.1:3000}
+    ports: ["8000:8000"]
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  healerplus_pg:
