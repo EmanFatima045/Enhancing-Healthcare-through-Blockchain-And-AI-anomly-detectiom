@@ -22,9 +22,17 @@ services:
       HEALER_DEMO_MODE: "false"
       DATABASE_URL: postgresql+psycopg://healerplus:${POSTGRES_PASSWORD}@db:5432/healerplus
       HEALER_CORS_ORIGINS: ${HEALER_CORS_ORIGINS:-http://127.0.0.1:3000}
-    ports: ["8000:8000"]
+    expose: ["8000"]
+    command: ["sh", "-c", "python -m alembic -c backend/alembic.ini upgrade head && python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"]
     depends_on:
       db:
         condition: service_healthy
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports: ["80"]
+    depends_on:
+      - api
 volumes:
   healerplus_pg:
