@@ -1,0 +1,17 @@
+.git
+.github
+.venv
+__pycache__
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+frontend/node_modules
+frontend/dist
+blockchain/node_modules
+blockchain/artifacts
+blockchain/cache
+blockchain/typechain-types
+datasets/ciciomt2024/raw
+datasets/ciciomt2024/prepared
+docs/assets

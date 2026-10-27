@@ -19,7 +19,7 @@
   <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white" alt="Python 3.11" />
   <img src="https://img.shields.io/badge/Solidity-0.8.20-363636?logo=solidity&logoColor=white" alt="Solidity 0.8.20" />
   <img src="https://img.shields.io/badge/Hardhat-2.22-FFF100?logoColor=black" alt="Hardhat 2.22" />
-  <img src="https://img.shields.io/badge/API_tests-3%20passing-brightgreen" alt="3 API tests passing" />
+  <img src="https://img.shields.io/badge/API_acceptance_tests-included-brightgreen" alt="API acceptance tests included" />
   <img src="https://img.shields.io/badge/contract_tests-7%20passing-brightgreen" alt="7 contract tests passing" />
 </p>
 
@@ -183,7 +183,10 @@ Or start each service manually in separate terminals:
 # Terminal 1 — API
 python backend/run_backend.py
 
-# Terminal 2 — web application
+# Terminal 2 — outbox worker (blockchain attestations and notifications)
+python -m backend.worker
+
+# Terminal 3 — web application
 cd frontend
 npm run dev
 ```
@@ -194,10 +197,11 @@ npm run dev
 | FastAPI root | <http://127.0.0.1:8000> |
 | Interactive API documentation | <http://127.0.0.1:8000/docs> |
 | Health check | <http://127.0.0.1:8000/api/v1/health> |
+| Readiness check | <http://127.0.0.1:8000/api/v1/health/ready> |
 
 ## 🐳 Docker API and PostgreSQL
 
-The Compose stack starts PostgreSQL 16 and the backend API. The Vite frontend remains a separate local process.
+The Compose stack starts PostgreSQL 16, the backend API, the durable outbox worker, and the production Nginx-served frontend at `http://localhost`.
 
 ```powershell
 $env:POSTGRES_PASSWORD = "choose-a-strong-password"
@@ -275,10 +279,13 @@ All application routes are prefixed with `/api/v1`.
 
 | Route group | Purpose |
 |---|---|
-| `/auth` | Registration, login/logout, staff approval, encryption keys and recipients |
+| `/auth` | Registration, login/logout, profile updates, password recovery, staff approval, encryption keys and recipients |
 | `/appointments` | Create, list and cancel appointment requests |
 | `/records` | Encrypted versions, recipient key envelopes, consent and break-glass requests |
 | `/blockchain` | Wallet challenges, consent intents, receipt submission and emergency state |
+| `/audit` | Role-scoped access and workflow history |
+| `/notifications` | Authenticated local notification inbox |
+| `/operations` | Restricted outbox health and recent job metadata for administrators |
 | `/security` | Event evaluation, restricted attack simulation, threat feed and model metrics |
 | `/iomt` | Simulated telemetry stream and inspection |
 | `/federated` | Simulation status and restricted training rounds |
@@ -287,8 +294,11 @@ Browse the live schema at <http://127.0.0.1:8000/docs> after starting the backen
 
 ## ✅ Testing and verification
 
+Every push and pull request runs the frontend production build, Solidity security tests, and backend acceptance tests through [GitHub Actions](.github/workflows/ci.yml).
+
 ```powershell
 # Backend acceptance flow
+python -m pip install -r backend/requirements-dev.txt
 python -m pytest backend/tests -q
 
 # Frontend type-check and production bundle
@@ -308,7 +318,7 @@ Verified on 18 October 2026:
 | Solidity authorization/security tests | ✅ 7 passed |
 | React production build | ✅ Completed |
 
-The frontend build currently reports a bundle-size warning for the main JavaScript chunk. Code splitting and image optimization remain useful performance improvements.
+The frontend build uses deterministic vendor code splitting; the remaining performance opportunity is optimizing the large photographic PNG assets.
 
 ## 📁 Repository structure
 
@@ -326,7 +336,7 @@ The frontend build currently reports a bundle-size warning for the main JavaScri
 ├── blockchain/               # Solidity contracts, deployment and security tests
 ├── datasets/                 # Small demonstration datasets
 ├── docs/                     # Architecture, security and experiment documentation
-├── docker-compose.yml        # FastAPI + PostgreSQL stack
+├── docker-compose.yml        # PostgreSQL + API + worker + Nginx stack
 └── run_all.bat               # Windows development launcher
 ```
 
@@ -338,6 +348,7 @@ The frontend build currently reports a bundle-size warning for the main JavaScri
 - [MetaMask and local-chain setup](docs/METAMASK_AND_LIVE_SETUP.md)
 - [Machine-learning experiments](docs/ML_EXPERIMENTS.md)
 - [Implementation report](docs/PROJECT_REPORT.md)
+- [Operations runbook](docs/OPERATIONS.md)
 
 ## 🗺️ Limitations and roadmap
 

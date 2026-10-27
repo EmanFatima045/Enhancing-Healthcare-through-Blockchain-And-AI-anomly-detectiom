@@ -1,5 +1,7 @@
 """Idempotent background jobs for scoped service writes and deterministic local notifications."""
 from datetime import datetime, timezone
+from email.message import EmailMessage
+import smtplib
 from sqlalchemy import select
 from web3 import Web3
 from ..core.config import settings
@@ -23,7 +25,8 @@ def process_jobs(db, limit: int = 25) -> dict:
             if job.topic == "NOTIFICATION":
                 delivery = db.scalar(select(NotificationDelivery).where(NotificationDelivery.dedupe_key == job.dedupe_key))
                 if not delivery:
-                    delivery = NotificationDelivery(dedupe_key=job.dedupe_key, channel="LOCAL", recipient=job.payload["recipient"], payload_json=job.payload, status="DELIVERED", delivered_at=datetime.now(timezone.utc)); db.add(delivery)
+                    channel, recipient = _deliver_notification(job.payload)
+                    delivery = NotificationDelivery(dedupe_key=job.dedupe_key, channel=channel, recipient=recipient, payload_json=job.payload, status="DELIVERED", delivered_at=datetime.now(timezone.utc)); db.add(delivery)
                 job.status = "COMPLETE"
             elif job.topic == "RECORD_ANCHOR":
                 tx_hash=_write_record_anchor(job.payload);job.payload={**job.payload,"tx_hash":tx_hash};job.status="SUBMITTED"
@@ -36,6 +39,32 @@ def process_jobs(db, limit: int = 25) -> dict:
         except Exception as exc:
             job.status = "RETRY" if job.attempts < 10 else "FAILED"; job.payload = {**job.payload, "last_error": type(exc).__name__}; failed += 1
     db.commit(); return {"processed": processed, "failed": failed}
+
+
+def _deliver_notification(payload: dict) -> tuple[str, str]:
+    recipient = payload["recipient"]
+    if recipient == "local-care-team":
+        recipient = settings.CARE_TEAM_EMAIL or recipient
+    if settings.NOTIFICATION_SINK == "local":
+        return "LOCAL", recipient
+    subject = str(payload.get("kind", "HealerPlus notification")).replace("_", " ").title()
+    message = EmailMessage()
+    message["From"] = settings.SMTP_FROM
+    message["To"] = recipient
+    message["Subject"] = f"HealerPlus: {subject}"
+    if payload.get("kind") == "PASSWORD_RESET":
+        scheme = "http" if settings.ENVIRONMENT in {"development", "test"} else "https"
+        link = f"{scheme}://{settings.APP_DOMAIN}/reset-password?token={payload['reset_token']}"
+        message.set_content(f"Use this HealerPlus password reset link within 30 minutes:\n\n{link}\n\nIf you did not request this, ignore this message.")
+    else:
+        message.set_content("A new HealerPlus care update is available in your authenticated notification inbox.")
+    with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10) as client:
+        if settings.SMTP_STARTTLS:
+            client.starttls()
+        if settings.SMTP_USERNAME or settings.SMTP_PASSWORD:
+            client.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
+        client.send_message(message)
+    return "SMTP", recipient
 
 def _write_record_anchor(payload: dict) -> str:
     if "RECORD_ANCHOR" not in settings.SERVICE_SIGNER_SCOPES or not settings.SERVICE_SIGNER_PRIVATE_KEY: raise RuntimeError("Scoped record anchor signer is unavailable")

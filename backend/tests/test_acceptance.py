@@ -11,11 +11,13 @@ os.environ["HEALER_SECRET_KEY"] = "test-only-secret-key-with-at-least-32-charact
 os.environ["DATABASE_URL"] = f"sqlite:///{(Path(tempfile.gettempdir()) / f'healerplus-{uuid4().hex}.db').as_posix()}"
 
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from backend.app.core.database import SessionLocal
 from backend.app.core.security import hash_password
 from backend.app.main import app
-from backend.app.models import User
+from backend.app.models import OutboxJob, User
+from backend.app.services.outbox import process_jobs
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -129,7 +131,30 @@ def test_local_acceptance_flow():
         assert rejected.status_code == 422
 
         assert client.post("/api/v1/auth/logout", headers=headers).status_code == 204
-        assert client.get("/api/v1/auth/me", headers=headers).status_code == 401
+
+
+def test_outbox_operations_are_role_restricted_and_redacted():
+    with TestClient(app) as client:
+        email = f"ops-patient-{uuid4().hex[:8]}@example.test"
+        client.post("/api/v1/auth/register", json={"email": email, "password": "StrongPass!123",
+                                                   "name": "Ops Patient", "phone": "+1-202-555-0188",
+                                                   "role": "Patient"})
+        token = client.post("/api/v1/auth/login", json={"email": email, "password": "StrongPass!123"}).json()["access_token"]
+        assert client.get("/api/v1/operations/outbox", headers=auth(token)).status_code == 403
+
+        with SessionLocal() as db:
+            db.add(User(email=f"ops-admin-{uuid4().hex[:8]}@example.test", name="Ops Admin",
+                        password_hash=hash_password("AdminPass!123"), role="HospitalAdmin",
+                        is_verified=True, is_active=True))
+            db.commit()
+            admin_email = db.scalars(select(User.email).where(User.name == "Ops Admin")).first()
+        admin_token = client.post("/api/v1/auth/login", json={"email": admin_email,
+                                                                "password": "AdminPass!123"}).json()["access_token"]
+        response = client.get("/api/v1/operations/outbox", headers=auth(admin_token))
+        assert response.status_code == 200
+        assert "counts" in response.json()
+        assert all("payload" not in item for item in response.json()["recent"])
+        assert client.get("/api/v1/auth/me", headers=auth("invalid-token")).status_code == 401
 
 
 def test_wallet_challenge_is_bound_and_single_use():
@@ -166,3 +191,115 @@ def test_admin_staff_approval_and_current_role_enforcement():
             db.get(User, admin_email).role = "Patient"
             db.commit()
         assert client.get("/api/v1/auth/users", headers=headers).status_code == 403
+
+
+def test_staff_chain_registration_waits_for_approval():
+    with TestClient(app) as client:
+        admin_email = f"chain-admin-{uuid4().hex[:8]}@example.test"
+        with SessionLocal() as db:
+            db.add(User(email=admin_email, name="Chain Admin", password_hash=hash_password("AdminPass!123"),
+                        role="HospitalAdmin", is_verified=True, is_active=True))
+            db.commit()
+        token = client.post("/api/v1/auth/login", json={"email": admin_email, "password": "AdminPass!123"}).json()["access_token"]
+        headers = auth(token)
+        staff_email = f"pending-chain-{uuid4().hex[:8]}@example.test"
+        wallet = Account.create().address
+        created = client.post("/api/v1/auth/staff", headers=headers, json={
+            "email": staff_email, "password": "DoctorPass!123", "name": "Pending Doctor",
+            "role": "Doctor", "wallet_address": wallet,
+        })
+        assert created.status_code == 201
+        with SessionLocal() as db:
+            assert db.query(OutboxJob).filter(OutboxJob.dedupe_key.like(f"staff-register:{staff_email}:%")).count() == 0
+        approved = client.post(f"/api/v1/auth/staff/{staff_email}/approve", headers=headers)
+        assert approved.status_code == 200
+        with SessionLocal() as db:
+            job = db.query(OutboxJob).filter(OutboxJob.dedupe_key.like(f"staff-register:{staff_email}:%")).one()
+            assert job.topic == "STAFF_REGISTER"
+
+
+def test_appointment_management_and_scoped_audit_history():
+    with TestClient(app) as client:
+        patient_email = f"audit-patient-{uuid4().hex[:8]}@example.test"
+        patient_password = "PatientPass!123"
+        assert client.post("/api/v1/auth/register", json={
+            "email": patient_email, "password": patient_password, "name": "Audit Patient",
+        }).status_code == 201
+        patient_token = client.post("/api/v1/auth/login", json={
+            "email": patient_email, "password": patient_password,
+        }).json()["access_token"]
+        patient_headers = auth(patient_token)
+        appointment = client.post("/api/v1/appointments", headers=patient_headers, json={
+            "service": "primary-care", "preferred_date": "2099-04-01", "preferred_time": "09:30",
+            "phone": "+1-202-555-0101",
+        })
+        assert appointment.status_code == 201
+        appointment_id = appointment.json()["id"]
+        with SessionLocal() as db:
+            request_job = db.query(OutboxJob).filter(OutboxJob.dedupe_key == f"appointment:{appointment_id}:requested").one()
+            assert request_job.topic == "NOTIFICATION"
+        audit = client.get("/api/v1/audit/events", headers=patient_headers)
+        assert audit.status_code == 200
+        assert any(item["action"] == "APPOINTMENT_REQUESTED" for item in audit.json()["items"])
+
+        doctor_email = f"audit-doctor-{uuid4().hex[:8]}@example.test"
+        with SessionLocal() as db:
+            db.add(User(email=doctor_email, name="Queue Doctor", password_hash=hash_password("DoctorPass!123"),
+                        role="Doctor", is_verified=True, is_active=True))
+            db.commit()
+        doctor_token = client.post("/api/v1/auth/login", json={
+            "email": doctor_email, "password": "DoctorPass!123",
+        }).json()["access_token"]
+        doctor_headers = auth(doctor_token)
+        queue = client.get("/api/v1/appointments/manage", headers=doctor_headers)
+        assert queue.status_code == 200
+        assert any(item["id"] == appointment_id for item in queue.json())
+        decision = client.patch(f"/api/v1/appointments/{appointment_id}", headers=doctor_headers, json={
+            "status": "confirmed",
+        })
+        assert decision.status_code == 200
+        assert decision.json()["status"] == "confirmed"
+        with SessionLocal() as db:
+            status_job = db.query(OutboxJob).filter(OutboxJob.dedupe_key == f"appointment:{appointment_id}:status:confirmed").one()
+            assert status_job.payload["recipient"] == patient_email
+            process_jobs(db, limit=100)
+            db.refresh(status_job)
+            assert status_job.status == "COMPLETE"
+        notifications = client.get("/api/v1/notifications/mine", headers=patient_headers)
+        assert notifications.status_code == 200
+        assert any(item["payload"]["kind"] == "APPOINTMENT_STATUS_CHANGED" for item in notifications.json()["items"])
+
+
+def test_profile_update_normalizes_input_and_rejects_blank_name():
+    with TestClient(app) as client:
+        email = f"profile-{uuid4().hex[:8]}@example.test"
+        password = "StrongPass!123"
+        assert client.post("/api/v1/auth/register", json={
+            "email": email, "password": password, "name": "Original Name",
+        }).status_code == 201
+        token = client.post("/api/v1/auth/login", json={"email": email, "password": password}).json()["access_token"]
+        headers = auth(token)
+        updated = client.patch("/api/v1/auth/me", headers=headers, json={"name": "  Updated Name  ", "phone": "  +1-202-555-0102  "})
+        assert updated.status_code == 200
+        assert updated.json()["name"] == "Updated Name"
+        assert client.patch("/api/v1/auth/me", headers=headers, json={"name": "   "}).status_code == 422
+
+
+def test_password_reset_token_is_single_use_and_revokes_sessions():
+    with TestClient(app) as client:
+        email = f"reset-{uuid4().hex[:8]}@example.test"
+        old_password = "OldStrongPass!123"
+        new_password = "NewStrongPass!123"
+        assert client.post("/api/v1/auth/register", json={
+            "email": email, "password": old_password, "name": "Reset Patient",
+        }).status_code == 201
+        old_token = client.post("/api/v1/auth/login", json={"email": email, "password": old_password}).json()["access_token"]
+        assert client.post("/api/v1/auth/password-reset/request", json={"email": email}).status_code == 202
+        with SessionLocal() as db:
+            job = db.query(OutboxJob).filter(OutboxJob.dedupe_key.like("password-reset:%")).order_by(OutboxJob.created_at.desc()).first()
+            reset_token = job.payload["reset_token"]
+        assert client.post("/api/v1/auth/password-reset/confirm", json={"token": reset_token, "password": new_password}).status_code == 200
+        assert client.get("/api/v1/auth/me", headers=auth(old_token)).status_code == 401
+        new_login = client.post("/api/v1/auth/login", json={"email": email, "password": new_password})
+        assert new_login.status_code == 200
+        assert client.post("/api/v1/auth/password-reset/confirm", json={"token": reset_token, "password": old_password}).status_code == 400

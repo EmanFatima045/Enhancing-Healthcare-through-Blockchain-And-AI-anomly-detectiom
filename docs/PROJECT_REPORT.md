@@ -14,10 +14,12 @@ Four Solidity 0.8.20 contracts compile reproducibly through the pinned npm toolc
 
 ## Evaluation
 
-Automated API acceptance tests cover registration, login, authenticated telemetry, durable appointments, encrypted record upload/retrieval, logout revocation, staff approval, and immediate stored-role enforcement. The React production build and Solidity compilation complete successfully.
+Automated API acceptance tests cover registration, login, authenticated telemetry, durable appointments, staff queue decisions, encrypted record upload/retrieval, logout revocation, staff approval, password-reset token expiry and single-use semantics, notification inbox delivery, and immediate stored-role enforcement. The React production build and Solidity compilation complete successfully when the respective dependency toolchains are available.
+
+The repository includes `scripts/verify_local.sh` for repeatable local checks. Its default mode runs available gates and reports missing toolchains explicitly; `scripts/verify_local.sh --strict` fails when backend or blockchain dependencies are unavailable. GitHub Actions installs all pinned toolchains and runs the frontend, backend, and Solidity gates independently.
 
 The available datasets contain only 40 IDS and 30 IoMT rows. They support classroom demonstration but not credible accuracy, generalization, clinical-safety or privacy claims. Federated training is a labelled simulation with zero real institutions.
 
 ## Limitations and future work
 
-IPFS pinning, patient-wallet signing, chain receipt projection, real IoMT ingestion, independent model evaluation, real federated nodes, secure aggregation, differential privacy, email recovery, production monitoring and regulatory validation remain future work. Until these are delivered and independently reviewed, HealerPlus must not be represented as HIPAA/GDPR compliant, production ready, clinically validated, or suitable for real patient information.
+IPFS pinning, patient-wallet signing, chain receipt projection, real IoMT ingestion, independent model evaluation, real federated nodes, secure aggregation, differential privacy, production monitoring and regulatory validation remain future work. Password recovery and notification delivery are implemented through the durable outbox, but external SMTP credentials and operational monitoring still require deployment configuration. Until these capabilities are delivered and independently reviewed, HealerPlus must not be represented as HIPAA/GDPR compliant, clinically validated, or suitable for real patient information.

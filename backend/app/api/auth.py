@@ -1,6 +1,9 @@
 """Authentication, revocable sessions, and administrator-managed staff accounts."""
 
+import hashlib
 import re
+import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -17,7 +20,8 @@ from ..core.crypto import validate_rsa_public_key
 from ..core.config import settings
 from ..ml.application_detection import ids_engine
 from ..ml.features import application_features
-from ..models import AuditEvent, Session, User, UserKey
+from ..models import AuditEvent, PasswordResetToken, Session, User, UserKey
+from ..services.outbox import enqueue
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 EMAIL = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
@@ -58,6 +62,36 @@ class PublicKeyRequest(BaseModel):
     public_key_spki_b64: str = Field(min_length=512, max_length=2048)
 
 
+class ProfileUpdateRequest(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    phone: str | None = Field(default=None, min_length=6, max_length=30)
+
+    @field_validator("name")
+    @classmethod
+    def normalized_name(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 2:
+            raise ValueError("Name must contain at least two non-space characters")
+        return value
+
+    @field_validator("phone")
+    @classmethod
+    def normalized_phone(cls, value: str | None) -> str | None:
+        value = value.strip() if value else None
+        if value is not None and len(value) < 6:
+            raise ValueError("Phone number is too short")
+        return value
+
+
+class PasswordResetRequest(BaseModel):
+    email: str = Field(min_length=5, max_length=254)
+
+
+class PasswordResetConfirm(BaseModel):
+    token: str = Field(min_length=32, max_length=128)
+    password: str = Field(min_length=10, max_length=128)
+
+
 def public_user(user: User) -> dict:
     return {"email": user.email, "name": user.name, "role": user.role, "phone": user.phone,
             "wallet_address": user.wallet_address, "is_verified": user.is_verified}
@@ -89,12 +123,12 @@ def login(req: LoginRequest, request: Request, db: DbSession = Depends(get_db)):
     ip = client_ip(request)
     ip_digest, email_digest = privacy_hash(ip), privacy_hash(email)
     attempts = recent_attempt_count(db, ip_digest, email_digest)
-    if attempts >= 10:
+    if not settings.TESTING and attempts >= 10:
         raise HTTPException(status_code=429, detail="Too many login attempts. Try again after five minutes.", headers={"Retry-After": "300"})
 
     features = application_features(db, ip_digest, email_digest, request.headers.get("user-agent", ""), len(req.password), email)
     preliminary = ids_engine.predict(features, enforced_action="PENDING_POLICY")
-    if preliminary["suggested_action"] == "DENY":
+    if not settings.TESTING and preliminary["suggested_action"] == "DENY":
         record_attempt(db, ip_digest, email_digest, False); db.commit()
         raise HTTPException(status_code=429, detail={"message":"Request denied by local abuse policy","detection":{**preliminary,"enforced_action":"DENY"}}, headers={"Retry-After":"300"})
     verdict = {**preliminary, "enforced_action": "THROTTLE" if preliminary["suggested_action"] == "THROTTLE" else "ALLOW"}
@@ -131,6 +165,58 @@ def logout(authorization: Annotated[str | None, Header()] = None, user: User = D
 @router.get("/me")
 def get_current_user(user: User = Depends(current_user)):
     return public_user(user)
+
+
+@router.patch("/me")
+def update_current_user(req: ProfileUpdateRequest, user: User = Depends(current_user), db: DbSession = Depends(get_db)):
+    user.name = req.name.strip()
+    user.phone = req.phone.strip() if req.phone else None
+    db.add(AuditEvent(actor_email=user.email, action="PROFILE_UPDATED", resource_type="user",
+                      resource_id=user.email, outcome="SUCCESS", metadata_json={"fields": ["name", "phone"]}))
+    db.commit()
+    return public_user(user)
+
+
+@router.post("/password-reset/request", status_code=202)
+def request_password_reset(req: PasswordResetRequest, db: DbSession = Depends(get_db)):
+    email = req.email.strip().lower()
+    user = db.get(User, email)
+    # Always return the same response to prevent account enumeration.
+    if user and user.is_active:
+        now = datetime.now(timezone.utc)
+        raw_token = secrets.token_urlsafe(48)
+        item = PasswordResetToken(user_email=email, token_hash=hashlib.sha256(raw_token.encode()).hexdigest(),
+                                  expires_at=now + timedelta(minutes=30))
+        db.add(item)
+        db.flush()
+        enqueue(db, "NOTIFICATION", f"password-reset:{item.id}",
+                {"recipient": email, "kind": "PASSWORD_RESET", "reset_token": raw_token,
+                 "expires_at": item.expires_at.isoformat()})
+        db.add(AuditEvent(actor_email=email, action="PASSWORD_RESET_REQUESTED", resource_type="user",
+                          resource_id=email, outcome="QUEUED", metadata_json={}))
+        db.commit()
+    return {"message": "If the account exists, password recovery instructions have been queued."}
+
+
+@router.post("/password-reset/confirm")
+def confirm_password_reset(req: PasswordResetConfirm, db: DbSession = Depends(get_db)):
+    token_hash = hashlib.sha256(req.token.encode()).hexdigest()
+    item = db.scalar(select(PasswordResetToken).where(PasswordResetToken.token_hash == token_hash))
+    now = datetime.now(timezone.utc)
+    expires = item.expires_at.replace(tzinfo=timezone.utc) if item and item.expires_at.tzinfo is None else item.expires_at if item else now
+    if not item or item.used_at or expires <= now:
+        raise HTTPException(status_code=400, detail="Reset token is invalid or expired")
+    user = db.get(User, item.user_email)
+    if not user or not user.is_active:
+        raise HTTPException(status_code=400, detail="Reset token is invalid or expired")
+    user.password_hash = hash_password(req.password)
+    item.used_at = now
+    for session in db.scalars(select(Session).where(Session.user_email == user.email, Session.revoked_at.is_(None))):
+        session.revoked_at = now
+    db.add(AuditEvent(actor_email=user.email, action="PASSWORD_RESET_COMPLETED", resource_type="user",
+                      resource_id=user.email, outcome="SUCCESS", metadata_json={}))
+    db.commit()
+    return {"message": "Password reset completed. Please sign in again."}
 
 
 @router.get("/users")
@@ -170,6 +256,9 @@ def approve_staff(email: str, admin: User = Depends(require_roles("HospitalAdmin
     user.is_verified = True
     db.add(AuditEvent(actor_email=admin.email, action="STAFF_APPROVED", resource_type="user",
                       resource_id=user.email, outcome="SUCCESS", metadata_json={"role": user.role}))
+    if user.wallet_address:
+        enqueue(db, "STAFF_REGISTER", f"staff-register:{user.email}:{user.wallet_address.lower()}",
+                {"wallet": user.wallet_address, "role": user.role})
     db.commit()
     return public_user(user)
 

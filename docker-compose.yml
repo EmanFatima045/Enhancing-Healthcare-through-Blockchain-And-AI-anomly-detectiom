@@ -20,10 +20,60 @@ services:
       HEALER_SECRET_KEY: ${HEALER_SECRET_KEY:?set HEALER_SECRET_KEY}
       HEALER_ENV: production
       HEALER_DEMO_MODE: "false"
+      HEALER_TRUSTED_HOSTS: ${HEALER_TRUSTED_HOSTS:-localhost,127.0.0.1}
+      HEALER_NOTIFICATION_SINK: ${HEALER_NOTIFICATION_SINK:-local}
+      HEALER_SMTP_HOST: ${HEALER_SMTP_HOST:-}
+      HEALER_SMTP_PORT: ${HEALER_SMTP_PORT:-587}
+      HEALER_SMTP_USERNAME: ${HEALER_SMTP_USERNAME:-}
+      HEALER_SMTP_PASSWORD: ${HEALER_SMTP_PASSWORD:-}
+      HEALER_SMTP_FROM: ${HEALER_SMTP_FROM:-}
+      HEALER_CARE_TEAM_EMAIL: ${HEALER_CARE_TEAM_EMAIL:-}
+      HEALER_SMTP_STARTTLS: ${HEALER_SMTP_STARTTLS:-true}
       DATABASE_URL: postgresql+psycopg://healerplus:${POSTGRES_PASSWORD}@db:5432/healerplus
       HEALER_CORS_ORIGINS: ${HEALER_CORS_ORIGINS:-http://127.0.0.1:3000}
+      ETH_RPC_URL: ${ETH_RPC_URL:-}
+      CHAIN_ID: ${CHAIN_ID:-31337}
+      HEALER_AUTH_CONTRACT_ADDRESS: ${HEALER_AUTH_CONTRACT_ADDRESS:-}
+      CONSENT_MANAGER_CONTRACT_ADDRESS: ${CONSENT_MANAGER_CONTRACT_ADDRESS:-}
+      MEDICAL_AUDIT_CONTRACT_ADDRESS: ${MEDICAL_AUDIT_CONTRACT_ADDRESS:-}
+      BREAK_GLASS_CONTRACT_ADDRESS: ${BREAK_GLASS_CONTRACT_ADDRESS:-}
+      HEALER_CIPHERTEXT_STORAGE: ${HEALER_CIPHERTEXT_STORAGE:-local}
+      KUBO_API_URL: ${KUBO_API_URL:-}
     expose: ["8000"]
-    command: ["sh", "-c", "python -m alembic -c backend/alembic.ini upgrade head && python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"]
+    command: ["sh", "-c", "python -m backend.migrate && python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    depends_on:
+      db:
+        condition: service_healthy
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      HEALER_SECRET_KEY: ${HEALER_SECRET_KEY:?set HEALER_SECRET_KEY}
+      HEALER_ENV: production
+      HEALER_DEMO_MODE: "false"
+      HEALER_NOTIFICATION_SINK: ${HEALER_NOTIFICATION_SINK:-local}
+      HEALER_SMTP_HOST: ${HEALER_SMTP_HOST:-}
+      HEALER_SMTP_PORT: ${HEALER_SMTP_PORT:-587}
+      HEALER_SMTP_USERNAME: ${HEALER_SMTP_USERNAME:-}
+      HEALER_SMTP_PASSWORD: ${HEALER_SMTP_PASSWORD:-}
+      HEALER_SMTP_FROM: ${HEALER_SMTP_FROM:-}
+      HEALER_CARE_TEAM_EMAIL: ${HEALER_CARE_TEAM_EMAIL:-}
+      HEALER_SMTP_STARTTLS: ${HEALER_SMTP_STARTTLS:-true}
+      DATABASE_URL: postgresql+psycopg://healerplus:${POSTGRES_PASSWORD}@db:5432/healerplus
+      ETH_RPC_URL: ${ETH_RPC_URL:-}
+      CHAIN_ID: ${CHAIN_ID:-31337}
+      HEALER_AUTH_CONTRACT_ADDRESS: ${HEALER_AUTH_CONTRACT_ADDRESS:-}
+      CONSENT_MANAGER_CONTRACT_ADDRESS: ${CONSENT_MANAGER_CONTRACT_ADDRESS:-}
+      MEDICAL_AUDIT_CONTRACT_ADDRESS: ${MEDICAL_AUDIT_CONTRACT_ADDRESS:-}
+      BREAK_GLASS_CONTRACT_ADDRESS: ${BREAK_GLASS_CONTRACT_ADDRESS:-}
+      HEALER_OUTBOX_POLL_SECONDS: ${HEALER_OUTBOX_POLL_SECONDS:-5}
+    command: ["sh", "-c", "python -m backend.migrate && python -m backend.worker"]
     depends_on:
       db:
         condition: service_healthy
@@ -31,8 +81,60 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-    ports: ["80"]
+    ports: ["127.0.0.1:32769:80"]
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+  backend-test:
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.test
+    environment:
+      HEALER_ENV: test
+      HEALER_SECRET_KEY: ${HEALER_SECRET_KEY:-test-only-secret-key-with-at-least-32-characters}
+      DATABASE_URL: postgresql+psycopg://healerplus:healerplus-test@test-db:5432/healerplus
+    command: ["sh", "-c", "python -m backend.migrate && python -m pytest backend/tests -q"]
+    depends_on:
+      test-db:
+        condition: service_healthy
+  test-db:
+    profiles: ["test"]
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: healerplus
+      POSTGRES_USER: healerplus
+      POSTGRES_PASSWORD: healerplus-test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healerplus"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+  blockchain:
+    profiles: ["integrations"]
+    build:
+      context: blockchain
+      dockerfile: Dockerfile
+    ports: ["127.0.0.1:8545:8545"]
+    command: ["npx", "hardhat", "node", "--hostname", "0.0.0.0", "--port", "8545"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8545', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_chainId',params:[]})}).then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  smtp:
+    profiles: ["integrations"]
+    image: axllent/mailpit:v1.21
+    ports: ["127.0.0.1:8025:8025", "127.0.0.1:1025:1025"]
+  ipfs:
+    profiles: ["integrations"]
+    image: ipfs/kubo:v0.32.1
+    ports: ["127.0.0.1:5001:5001", "127.0.0.1:8080:8080"]
+  prometheus:
+    profiles: ["integrations"]
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports: ["127.0.0.1:9090:9090"]
 volumes:
   healerplus_pg:

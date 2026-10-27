@@ -52,7 +52,9 @@ def wallet_verify(req: VerifyWalletRequest, user: User = Depends(verified_user),
     existing = db.scalar(select(User).where(User.wallet_address.ilike(recovered), User.email != user.email))
     if existing: raise HTTPException(409, "Wallet is already linked to another account")
     user.wallet_address = recovered; challenge.used_at = now
-    if user.role in ("Doctor","HospitalAdmin","SecurityAuditor"): enqueue(db,"STAFF_REGISTER",f"staff-register:{user.email}:{recovered.lower()}",{"wallet":recovered,"role":user.role})
+    if user.is_verified and user.role in ("Doctor","HospitalAdmin","SecurityAuditor"):
+        enqueue(db, "STAFF_REGISTER", f"staff-register:{user.email}:{recovered.lower()}",
+                {"wallet": recovered, "role": user.role})
     db.commit(); return {"wallet_address": recovered, "linked": True, "chain_id": settings.CHAIN_ID, "staff_registration":"QUEUED" if user.role != "Patient" else None}
 
 def require_wallet(user: User):
