@@ -1,130 +1,90 @@
 <p align="center">
-<img src="docs/assets/healerplus-readme-banner-1086.webp" alt="HealerPlus secure digital healthcare platform" width="1086" height="362" />
+  <img src="docs/assets/healerplus-readme-banner-1086.webp" alt="HealerPlus secure digital healthcare platform" width="1086" height="362">
 </p>
 
 <h1 align="center">HealerPlus</h1>
 
 <p align="center">
-  <strong>Enhancing Healthcare Security Through Blockchain, AI and Privacy-Preserving Record Exchange</strong>
+  <strong>A healthcare security demonstration built with React, FastAPI, AI-assisted monitoring, and Ethereum smart contracts.</strong>
 </p>
 
 <p align="center">
-  A full-stack academic platform combining a premium healthcare portal, encrypted medical records,
-  role-aware access control, Ethereum consent, anomaly detection and simulated IoMT monitoring.
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/React-19.1-61DAFB?logo=react&logoColor=061A23" alt="React 19.1" />
-  <img src="https://img.shields.io/badge/FastAPI-0.119-009688?logo=fastapi&logoColor=white" alt="FastAPI 0.119" />
-  <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white" alt="Python 3.11" />
-  <img src="https://img.shields.io/badge/Solidity-0.8.20-363636?logo=solidity&logoColor=white" alt="Solidity 0.8.20" />
-  <img src="https://img.shields.io/badge/Hardhat-2.22-FFF100?logoColor=black" alt="Hardhat 2.22" />
-  <img src="https://img.shields.io/badge/API_acceptance_tests-included-brightgreen" alt="API acceptance tests included" />
-  <img src="https://img.shields.io/badge/contract_tests-7%20passing-brightgreen" alt="7 contract tests passing" />
-</p>
-
-<p align="center">
-  <a href="#-quick-start">Quick start</a> •
-  <a href="#-system-architecture">Architecture</a> •
-  <a href="#-security-model">Security</a> •
-  <a href="#-smart-contracts">Smart contracts</a> •
-  <a href="#-testing-and-verification">Testing</a> •
-  <a href="#-documentation">Documentation</a>
+  <img src="https://img.shields.io/badge/React-19.1-61DAFB?logo=react&logoColor=061A23" alt="React 19.1">
+  <img src="https://img.shields.io/badge/FastAPI-0.119-009688?logo=fastapi&logoColor=white" alt="FastAPI 0.119">
+  <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white" alt="Python 3.11">
+  <img src="https://img.shields.io/badge/Solidity-0.8.20-363636?logo=solidity&logoColor=white" alt="Solidity 0.8.20">
+  <img src="https://img.shields.io/badge/Hardhat-2.22-FFF100?logoColor=black" alt="Hardhat 2.22">
 </p>
 
 > [!IMPORTANT]
-> HealerPlus is an academic technology demonstration. It is not a regulated clinical system, diagnostic tool, emergency service, or production-ready patient-record platform. Never enter real patient information, production wallet credentials, or recovery phrases.
+> HealerPlus is an academic demonstration. It is not a regulated clinical system, diagnostic tool, emergency service, or production patient-record platform. Do not enter real patient information, production credentials, private keys, or wallet recovery phrases.
 
-## ✨ Project overview
+## About the project
 
-HealerPlus explores how modern web engineering, client-side cryptography, blockchain verification and machine-learning-assisted monitoring can work together at a healthcare security boundary. The application deliberately distinguishes between capabilities that are implemented, demonstrations that are simulated, and integrations that require external infrastructure.
+HealerPlus explores how a modern healthcare portal can combine role-aware access control, browser-side record encryption, blockchain-backed consent, anomaly detection, and simulated connected-device monitoring.
 
-<table>
-  <tr>
-    <td width="50%">
-<img src="frontend/assets/homepage-dr-amelia-consultation-v3-1280.webp" alt="Doctor speaking with a patient in the HealerPlus interface" width="1280" height="720" />
-    </td>
-    <td width="50%">
-<img src="frontend/assets/healerplus-hospital-exterior-v2-1280.webp" alt="Modern hospital exterior used in the HealerPlus interface" width="1280" height="640" />
-    </td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Patient-centred digital care</strong></td>
-    <td align="center"><strong>Secure connected facilities</strong></td>
-  </tr>
-</table>
+The project contains:
 
-### What the project demonstrates
+- A responsive React and TypeScript patient portal
+- A FastAPI backend with persistent accounts, sessions, appointments, records, audit events, and notifications
+- Client-side AES-GCM record encryption and RSA-OAEP key wrapping
+- Solidity contracts for identity, consent, audit commitments, and emergency access
+- A local anomaly-detection pipeline for security events
+- Explicitly simulated IoMT telemetry and federated-learning demonstrations
+- SQLite for local development and PostgreSQL through Docker Compose
+- Responsive WebP imagery for mobile and desktop displays
 
-| Area | Implementation |
+## Main features
+
+| Area | Current implementation |
 |---|---|
-| Healthcare experience | Responsive React portal with services, professionals, facilities, contact, authentication, appointments and protected dashboards |
-| Identity and authorization | Patient-only public registration, revocable sessions, current database role checks, staff creation and administrator approval |
-| Encrypted records | AES-256-GCM record encryption in the browser and recipient-specific RSA-3072 OAEP/SHA-256 key envelopes |
-| Consent and auditability | MetaMask-signed local-chain consent, transaction receipt validation, contract-state checks and durable consent projections |
-| Blockchain security | Four Solidity contracts for identity, consent, audit registration and emergency break-glass access |
-| AI-assisted security | Reproducible local anomaly-detection pipeline with explicit toy-dataset limitations |
-| Connected health | Simulated IoMT telemetry inspection and a labelled in-process federated-learning demonstration |
-| Persistence | SQLAlchemy with SQLite for local development, PostgreSQL 16 through Docker and Alembic migrations |
+| Public website | Home, about, services, professionals, facilities, contact, FAQ, privacy, terms, and security pages |
+| Authentication | Patient registration, login, logout, password recovery, revocable sessions, and role checks |
+| Appointments | Patient requests, personal appointment history, cancellation requests, and staff review |
+| Medical records | Browser-encrypted record versions and recipient-specific wrapped keys |
+| Access history | Role-scoped audit events without medical plaintext or encryption keys |
+| Notifications | Local authenticated notification inbox with optional SMTP delivery |
+| Security monitoring | Local development IDS model, incident feed, and restricted staff console |
+| Blockchain | Optional local Hardhat network and four Solidity contracts on chain ID `31337` |
+| IoMT and federated learning | Labelled simulations; no physical devices or real hospital participants |
 
-## 🧭 System architecture
+## Architecture
 
 ```mermaid
 flowchart LR
-    U[Patient / Clinician / Admin] --> SPA[React 19 + Vite SPA]
-    SPA -->|JWT + JSON| API[FastAPI authorization boundary]
-    SPA -->|WebCrypto| CRYPTO[AES-GCM records<br/>RSA-OAEP key envelopes]
-    SPA -->|MetaMask + Viem| CHAIN[Local Ethereum<br/>Chain ID 31337]
-    API --> DB[(SQLite / PostgreSQL)]
-    API --> IDS[Application anomaly model]
-    API --> IOMT[Simulated IoMT telemetry]
-    API --> FL[Simulated federated rounds]
-    API -->|web3.py verification| CHAIN
-    API --> OUTBOX[Durable transaction outbox]
-    CHAIN --> AUTH[HealerAuth]
-    CHAIN --> CONSENT[ConsentManager]
-    CHAIN --> AUDIT[MedicalAuditRegistry]
-    CHAIN --> BREAK[BreakGlassEmergency]
+    User[Patient / Staff] --> Web[React + Vite]
+    Web -->|JWT and JSON| API[FastAPI]
+    Web -->|Web Crypto| Crypto[AES-GCM + RSA-OAEP]
+    API --> DB[(SQLite or PostgreSQL)]
+    API --> IDS[Anomaly detection]
+    API --> Sim[IoMT and federated simulations]
+    Web -->|MetaMask / Viem| Chain[Optional Hardhat chain]
+    API -->|web3.py verification| Chain
+    API --> Worker[Durable outbox worker]
 ```
 
-The application is a modular monolith: one React SPA communicates with one FastAPI service. SQLAlchemy stores identities, sessions, login attempts, appointments, encrypted envelopes, audit events, telemetry events, chain intents and outbox jobs. Blockchain transactions remain untrusted until the backend verifies the network, receipt, sender, destination, function arguments, event and current contract state.
+The frontend uses `/api` through Vite's development proxy. The backend treats blockchain operations as configuration-dependent and continues to provide its non-blockchain features when no RPC endpoint is configured.
 
-## 🛡️ Capability status
-
-| Capability | Status | Notes |
-|---|---:|---|
-| Accounts, roles and revocable sessions | ✅ Implemented | Persisted with SQLAlchemy; authorization is rechecked on protected requests |
-| Appointment requests | ✅ Implemented | Requests persist but do not represent confirmed clinical availability |
-| Client-encrypted record storage | ✅ Implemented | The server stores ciphertext and wrapped keys, not plaintext records |
-| Local blockchain contracts | ✅ Implemented | `run_all.bat` starts Hardhat and verifies/deploys all four contracts on chain `31337` |
-| Wallet consent verification | ✅ Local integration | Backend verifies deployed bytecode and receipts; user transactions still require MetaMask |
-| AI intrusion detection | 🧪 Development model | Trained from the checked-in 40-row demonstration dataset |
-| IoMT monitoring | 🧪 Simulated | No physical medical device is connected |
-| Federated learning | 🧪 Simulated | In-process FedAvg demonstration; no real hospitals or privacy guarantee |
-| Ciphertext storage | ✅ Local / optional remote | Database-backed locally; Kubo or Pinata can be configured explicitly |
-| Emergency key delivery | ⚙️ Configuration dependent | Requires institutional RSA escrow and a verified break-glass transaction |
-
-## 🧰 Technology stack
+## Technology stack
 
 | Layer | Technologies |
 |---|---|
 | Frontend | React 19, TypeScript 5.9, Vite 7, React Router, Framer Motion, Lucide, Embla Carousel, Viem |
-| Backend | Python 3.11, FastAPI, Uvicorn, Pydantic, SQLAlchemy, Alembic, PyJWT |
-| Cryptography | Web Crypto API, AES-256-GCM, RSA-3072 OAEP/SHA-256, PBKDF2-SHA-256 |
-| AI and data | scikit-learn, pandas, NumPy, joblib, Random Forest, histogram gradient boosting, Isolation Forest |
+| Backend | Python, FastAPI, Uvicorn, Pydantic, SQLAlchemy, Alembic, PyJWT |
+| Data and AI | scikit-learn, pandas, NumPy, joblib |
 | Blockchain | Solidity 0.8.20, Hardhat, Ethers.js, web3.py, MetaMask |
-| Storage | SQLite, PostgreSQL 16, optional Kubo/Pinata ciphertext providers |
-| Operations | Docker Compose, Windows launchers, Pytest |
+| Storage | SQLite, PostgreSQL 16, optional Kubo or Pinata ciphertext storage |
+| Operations | Docker Compose, Windows launchers, Pytest, GitHub Actions |
 
-## 🚀 Quick start
+## Quick start on Windows
 
 ### Prerequisites
 
-- Python `3.11`
-- Node.js `20`, `22`, or `24`
+- Python 3.11 or a compatible Python 3 installation
+- Node.js 20 or newer with npm
 - Git
-- MetaMask only for local blockchain transactions
-- Docker Desktop only for the PostgreSQL deployment
+- Docker Desktop only if using the containerized PostgreSQL stack
+- MetaMask only if testing wallet and blockchain workflows
 
 ### 1. Clone the repository
 
@@ -133,259 +93,220 @@ git clone https://github.com/EmanFatima045/Enhancing-Healthcare-through-Blockcha
 cd Enhancing-Healthcare-through-Blockchain-And-AI-anomly-detectiom
 ```
 
-### 2. Configure the environment
+### 2. Create the local environment file
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Open `.env` and replace `HEALER_SECRET_KEY` with a unique random value containing at least 32 characters. The backend intentionally refuses to start without it. The real `.env` file is excluded from Git.
+Open `.env` and replace the value of `HEALER_SECRET_KEY` with a unique random string of at least 32 characters. Keep `.env` private; it is excluded from Git.
+
+The Windows backend launcher can also create `.env` automatically with a generated local secret when the file is missing.
 
 ### 3. Install dependencies
 
 ```powershell
 python -m pip install -r backend/requirements.txt
 
-cd frontend
+Push-Location frontend
 npm install
-cd ..
+Pop-Location
 
-cd blockchain
+Push-Location blockchain
 npm install
-cd ..
+Pop-Location
 ```
 
-### 4. Initialize the database
-
-```powershell
-cd backend
-python -m alembic -c alembic.ini upgrade head
-cd ..
-```
-
-Create the first trusted local administrator. The password prompt is hidden and requires at least 10 characters.
-
-```powershell
-python backend/manage.py create-admin --email admin@example.test --name "Local Administrator"
-```
-
-### 5. Start the application
-
-On Windows, the simplest option is:
+### 4. Start the application
 
 ```powershell
 .\run_all.bat
 ```
 
-The master launcher starts the Hardhat blockchain, verifies or deploys the four contracts, exports fresh addresses/ABIs, starts FastAPI and Vite, and opens the browser only after every layer reports ready.
+The launcher opens separate windows for:
 
-Or start each service manually in separate terminals:
+- FastAPI backend on <http://127.0.0.1:8000>
+- Durable outbox worker
+- Vite frontend on <http://127.0.0.1:3000>
+
+It does not start the optional blockchain. See [Local blockchain](#local-blockchain) when testing contract-backed features.
+
+### Start services manually
+
+Use three PowerShell terminals from the repository root:
 
 ```powershell
-# Terminal 1 — API
+# Terminal 1: backend
 python backend/run_backend.py
+```
 
-# Terminal 2 — outbox worker (blockchain attestations and notifications)
+```powershell
+# Terminal 2: worker
 python -m backend.worker
+```
 
-# Terminal 3 — web application
-cd frontend
+```powershell
+# Terminal 3: frontend
+Set-Location frontend
 npm run dev
 ```
 
-| Service | Local URL |
+### Local URLs
+
+| Service | URL |
 |---|---|
-| Web application | <http://127.0.0.1:3000> |
-| FastAPI root | <http://127.0.0.1:8000> |
-| Interactive API documentation | <http://127.0.0.1:8000/docs> |
-| Health check | <http://127.0.0.1:8000/api/v1/health> |
-| Readiness check | <http://127.0.0.1:8000/api/v1/health/ready> |
+| Website | <http://127.0.0.1:3000> |
+| Backend status | <http://127.0.0.1:8000> |
+| OpenAPI documentation | <http://127.0.0.1:8000/docs> |
+| Health endpoint | <http://127.0.0.1:8000/api/v1/health> |
+| Readiness endpoint | <http://127.0.0.1:8000/api/v1/health/ready> |
+| Prometheus metrics | <http://127.0.0.1:8000/metrics> |
 
-## 🐳 Docker API and PostgreSQL
+## Local blockchain
 
-The Compose stack starts PostgreSQL 16, the backend API, the durable outbox worker, and the production Nginx-served frontend at `http://localhost`.
+Blockchain support is optional. Start the Hardhat node in one terminal:
 
 ```powershell
-$env:POSTGRES_PASSWORD = "choose-a-strong-password"
+Set-Location blockchain
+npm run node
+```
+
+Deploy the contracts from a second terminal:
+
+```powershell
+Set-Location blockchain
+npm run deploy:local
+```
+
+The deployment exports contract addresses and ABIs for the backend and frontend. The local RPC endpoint is `http://127.0.0.1:8545`, and its chain ID is `31337`.
+
+To use MetaMask, add the local network and import only a throwaway Hardhat development account. Never use a real wallet recovery phrase. See [MetaMask and local-chain setup](docs/METAMASK_AND_LIVE_SETUP.md) for details.
+
+## Docker Compose
+
+The default Compose stack runs PostgreSQL, the API, the outbox worker, and the Nginx-served frontend.
+
+```powershell
+$env:POSTGRES_PASSWORD = "choose-a-strong-local-password"
 $env:HEALER_SECRET_KEY = "choose-at-least-32-random-characters"
 docker compose up --build
 ```
 
-Run Alembic migrations before upgrading an existing deployment.
+Open the containerized website at <http://127.0.0.1:32769>.
 
-## 🔐 Security model
+Optional local integrations are available through the `integrations` profile:
 
-### Authentication and roles
+```powershell
+docker compose --profile integrations up --build
+```
 
-- Public signup creates only a verified `Patient` account.
-- A `HospitalAdmin` creates staff and explicitly approves them.
-- JWTs contain the subject and session identifier; current role, verification, activity, expiry and revocation are checked from persistent state.
+This profile also starts Hardhat, Mailpit, Kubo, and Prometheus. Consult [Operations](docs/OPERATIONS.md) before changing storage or notification providers.
+
+## Security model
+
+- Public registration creates patient accounts only.
+- Protected requests recheck the current session and database-backed role.
 - Logout revokes the server-side session.
-- The SPA keeps its short-lived bearer token in `sessionStorage`. Production should use secure HTTP-only cookies with CSRF protection and a strict Content Security Policy.
+- Each record version is encrypted in the browser with a new AES-256-GCM key and nonce.
+- Record keys are wrapped separately for authorized recipients with RSA-3072 OAEP/SHA-256.
+- The backend stores ciphertext and key envelopes, not record plaintext.
+- Blockchain receipts and contract state must be verified before they are trusted.
+- API responses use restrictive security headers and disable caching for API routes.
 
-### Encrypted record lifecycle
+This design is educational, not a security certification. Production use would require hardened cookie sessions, CSRF and CSP controls, managed secrets, monitoring, backups, independent testing, and legal and regulatory review.
 
-1. The browser creates a new AES-256-GCM data key and 12-byte nonce for every record version.
-2. Plaintext is encrypted before upload, with canonical record metadata authenticated as additional data.
-3. The AES key is wrapped separately for each recipient with RSA-3072 OAEP/SHA-256.
-4. The non-extractable working private key stays in browser IndexedDB.
-5. Recovery uses an encrypted PKCS#8 backup protected by PBKDF2-SHA-256 and AES-GCM.
-6. Sharing unwraps and rewraps the data key locally; private keys and plaintext are never sent to the API.
-7. Revocation blocks future API delivery but cannot erase information already downloaded by a recipient.
+## API groups
 
-Losing both the browser key and encrypted backup makes old records cryptographically unrecoverable. An Ethereum wallet is not a record-decryption key.
-
-## 🏥 Hospital administration panel
-
-Create the first administrator with the secure interactive helper:
-
-```powershell
-.\create_admin.bat
-```
-
-After signing in, a verified `HospitalAdmin` is routed to `/admin`. The protected operations workspace includes appointment review and doctor assignment, staff onboarding/approval/suspension, patient and staff listings, audit events, security incidents, operational counts, and live smart-contract bytecode status. Patient sessions receive `403 Forbidden` from every administration endpoint.
-
-## ⛓️ Smart contracts
-
-| Contract | Responsibility |
-|---|---|
-| `HealerAuth.sol` | Patient registration, trusted staff assignment, verification and account status |
-| `ConsentManager.sol` | Patient-owned, category-aware read/write consent with expiry and revocation |
-| `MedicalAuditRegistry.sol` | Opaque record commitments, restricted audit entries and incident attestations |
-| `BreakGlassEmergency.sol` | Time-bounded emergency sessions tied to a doctor, patient and record |
-
-Contracts store opaque identifiers and commitments—never names, diagnoses, record plaintext, encryption keys or detailed emergency justification.
-
-### Run the local blockchain
-
-```powershell
-cd blockchain
-npm test
-npm run node
-```
-
-Keep the node running, then deploy from a second terminal:
-
-```powershell
-cd blockchain
-npm run deploy:local
-```
-
-The deployment exports addresses and ABIs to the blockchain, backend and frontend trees. The local node uses <http://127.0.0.1:8545> and chain ID `31337`. Use only the throwaway accounts printed by Hardhat.
-
-## 🤖 AI, IoMT and federated demonstrations
-
-The detector loads versioned artifacts instead of training during API startup. Reproduce its experiment with:
-
-```powershell
-python -m backend.app.ml.experiments all
-```
-
-The report records class support, macro F1, precision/recall, confusion matrix, attack PR-AUC, false-positive rate, latency, versions, schemas, thresholds, seeds and checksums. Results from the 40-row synthetic fixture are toy results and must not be presented as real-world accuracy evidence.
-
-IoMT values and federated rounds are explicitly simulated. The system makes no claim of clinical validation, real-device connectivity, secure aggregation or differential privacy.
-
-## 🔌 API surface
-
-All application routes are prefixed with `/api/v1`.
+Application endpoints use the `/api/v1` prefix.
 
 | Route group | Purpose |
 |---|---|
-| `/auth` | Registration, login/logout, profile updates, password recovery, staff approval, encryption keys and recipients |
-| `/appointments` | Create, list and cancel appointment requests |
-| `/records` | Encrypted versions, recipient key envelopes, consent and break-glass requests |
-| `/blockchain` | Wallet challenges, consent intents, receipt submission and emergency state |
-| `/audit` | Role-scoped access and workflow history |
-| `/notifications` | Authenticated local notification inbox |
-| `/operations` | Restricted outbox health and recent job metadata for administrators |
-| `/security` | Event evaluation, restricted attack simulation, threat feed and model metrics |
-| `/iomt` | Simulated telemetry stream and inspection |
-| `/federated` | Simulation status and restricted training rounds |
-| `/admin` | Hospital overview, appointment review and audit events for `HospitalAdmin` only |
+| `/auth` | Accounts, sessions, profiles, password recovery, staff controls, and encryption keys |
+| `/appointments` | Appointment requests and staff decisions |
+| `/records` | Encrypted records, key envelopes, sharing, consent, and emergency workflows |
+| `/blockchain` | Wallet challenges, transaction intents, receipts, and chain status |
+| `/audit` | Authorized activity history |
+| `/notifications` | User notification inbox |
+| `/operations` | Restricted worker and outbox health |
+| `/security` | Event evaluation, incident feed, and model metrics |
+| `/iomt` | Simulated telemetry |
+| `/federated` | Simulated federated-learning rounds |
 
-Browse the live schema at <http://127.0.0.1:8000/docs> after starting the backend.
+The live, authoritative route schema is available at <http://127.0.0.1:8000/docs> while the backend is running.
 
-## ✅ Testing and verification
+## Testing
 
-Every push and pull request runs the frontend production build, Solidity security tests, and backend acceptance tests through [GitHub Actions](.github/workflows/ci.yml).
+### Backend
 
 ```powershell
-# Backend acceptance flow
 python -m pip install -r backend/requirements-dev.txt
 python -m pytest backend/tests -q
+```
 
-# Frontend type-check and production bundle
-cd frontend
+### Frontend
+
+```powershell
+Set-Location frontend
 npm run build
+```
 
-# Solidity security tests
-cd ../blockchain
+### Smart contracts
+
+```powershell
+Set-Location blockchain
 npm test
 ```
 
-Verified on 19 October 2026:
+GitHub Actions runs the repository's configured checks for pushes and pull requests. Test results should be taken from the current run rather than from hard-coded counts in this README.
 
-| Check | Result |
-|---|---:|
-| Backend acceptance tests | ✅ 4 passed |
-| Solidity authorization/security tests | ✅ 7 passed |
-| React production build | ✅ Completed |
+## Image delivery
 
-The frontend build uses deterministic vendor code splitting; the remaining performance opportunity is optimizing the large photographic PNG assets.
+The interface uses optimized WebP assets with responsive mobile, tablet, and desktop candidates. React supplies `srcset`, `sizes`, intrinsic dimensions, eager loading for important above-the-fold images, and lazy loading for below-the-fold content. The conversion script and measured asset report are available at:
 
-## 📁 Repository structure
+- [`scripts/optimize_images.py`](scripts/optimize_images.py)
+- [`docs/image-optimization-report.json`](docs/image-optimization-report.json)
+
+## Repository structure
 
 ```text
 .
-├── frontend/                 # React/Vite application and healthcare imagery
-│   ├── src/                  # Routes, record vault, WebCrypto and wallet client
-│   └── assets/               # Local interface photography
-├── backend/                  # FastAPI service, persistence and security boundary
-│   ├── app/api/              # Authentication, records, blockchain, IDS and IoMT APIs
-│   ├── app/core/             # Configuration, auth, crypto and database controls
-│   ├── app/ml/               # Detection experiments and model artifacts
-│   ├── alembic/              # Database migrations
-│   └── tests/                # Acceptance tests
-├── blockchain/               # Solidity contracts, deployment and security tests
-├── datasets/                 # Small demonstration datasets
-├── docs/                     # Architecture, security and experiment documentation
-├── docker-compose.yml        # PostgreSQL + API + worker + Nginx stack
-└── run_all.bat               # Windows development launcher
+|-- frontend/              React, TypeScript, Vite, and responsive WebP assets
+|-- backend/               FastAPI application, database, AI pipeline, and tests
+|-- blockchain/            Solidity contracts, deployment scripts, and tests
+|-- datasets/              Small academic demonstration datasets
+|-- docs/                  Architecture, security, operations, and project reports
+|-- monitoring/            Prometheus configuration
+|-- scripts/               Local verification and image optimization utilities
+|-- docker-compose.yml     PostgreSQL, API, worker, frontend, and integrations
+`-- run_all.bat            Windows launcher for API, worker, and frontend
 ```
 
-## 📚 Documentation
+## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
-- [Cyber-security analysis](docs/CYBER_SECURITY_ANALYSIS.md)
-- [Smart-contract security specification](docs/SMART_CONTRACT_SPEC.md)
-- [MetaMask and local-chain setup](docs/METAMASK_AND_LIVE_SETUP.md)
+- [Cybersecurity analysis](docs/CYBER_SECURITY_ANALYSIS.md)
+- [Smart-contract specification](docs/SMART_CONTRACT_SPEC.md)
+- [MetaMask and live setup](docs/METAMASK_AND_LIVE_SETUP.md)
 - [Machine-learning experiments](docs/ML_EXPERIMENTS.md)
-- [Implementation report](docs/PROJECT_REPORT.md)
-- [Operations runbook](docs/OPERATIONS.md)
+- [Project report](docs/PROJECT_REPORT.md)
+- [Operations](docs/OPERATIONS.md)
 
-## 🗺️ Limitations and roadmap
+## Known limitations
 
-- Replace browser-readable bearer tokens with hardened cookie sessions.
-- Add CSP, CSRF controls, managed secrets, encrypted backups and operational monitoring.
-- Split the frontend bundle and optimize the large PNG assets.
-- Integrate approved encrypted object storage or a reviewed IPFS pinning workflow.
-- Validate against representative, independently governed datasets.
-- Connect real IoMT ingestion only after device identity, transport security and clinical-safety review.
-- Evaluate contracts through an independent smart-contract security audit.
-- Add real federated participants, secure aggregation and a measured privacy mechanism.
-- Complete jurisdiction-specific privacy, retention and regulatory review before real-world use.
+- AI results come from small demonstration data and are not evidence of production detection accuracy.
+- IoMT telemetry and federated learning are simulations.
+- Appointment requests do not represent real clinical availability.
+- Contact details, professionals, facilities, and photography are illustrative.
+- Blockchain features require a separately running chain, deployed contracts, and wallet configuration.
+- Kubo, Pinata, SMTP, and emergency escrow require explicit external configuration.
+- No real healthcare data should be stored in this academic environment.
 
-## 🤝 Contributing
+## Contributing
 
-Contributions are welcome for academic and defensive-security improvements. Keep capability labels honest, add tests for security-sensitive changes, and never commit secrets, real patient data, private keys or production wallet material.
+Keep changes focused, add tests for security-sensitive behavior, and clearly label simulated or configuration-dependent capabilities. Never commit secrets, patient data, private keys, recovery phrases, or production credentials.
 
-1. Fork the repository.
-2. Create a focused feature branch.
-3. Run the backend, frontend and contract checks.
-4. Open a pull request explaining the security and data-handling impact.
+Before opening a pull request, run the backend tests, frontend build, and smart-contract tests relevant to your change.
 
 ---
 
-<p align="center">
-  Built as an academic exploration of safer, more transparent digital healthcare systems.
-</p>
+<p align="center">Built as an academic exploration of safer and more transparent digital healthcare systems.</p>
