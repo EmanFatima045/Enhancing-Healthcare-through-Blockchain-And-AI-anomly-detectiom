@@ -1,26 +1,70 @@
+export type ImageMetadata = { srcSet: string; width: number; height: number }
+
+const imageMetadata = new Map<string, ImageMetadata>()
+const optimizedAssets = import.meta.glob('../assets/*.webp', { eager: true, query: '?url', import: 'default' }) as Record<string, string>
+const image = (src: string, sources: Array<[string, number]>, width: number, height: number) => {
+  imageMetadata.set(src, { srcSet: sources.map(([url, size]) => `${url} ${size}w`).join(', '), width, height })
+  return src
+}
+const url = (path: string) => {
+  const resolved = optimizedAssets[path]
+  if (!resolved) throw new Error(`Missing optimized image asset: ${path}`)
+  return resolved
+}
+const landscape = (stem: string, height: number) => image(
+  url(`../assets/${stem}-1280.webp`),
+  [[url(`../assets/${stem}-640.webp`), 640], [url(`../assets/${stem}-960.webp`), 960], [url(`../assets/${stem}-1280.webp`), 1280]],
+  1280,
+  height,
+)
+const portrait = (stem: string) => image(
+  url(`../assets/${stem}-1024.webp`),
+  [[url(`../assets/${stem}-480.webp`), 480], [url(`../assets/${stem}-800.webp`), 800], [url(`../assets/${stem}-1024.webp`), 1024]],
+  1024,
+  1536,
+)
+
+const authSignup = portrait('auth-signup-young-female-doctor')
+const authSignin = portrait('auth-signin-doctor-nurse')
+const staffDoctorMichael = portrait('staff-doctor-michael-reed')
+const staffDoctorAmelia = portrait('staff-doctor-amelia-brooks')
+const staffNurseChloe = portrait('staff-nurse-chloe-adams')
+const hospitalExterior = landscape('healerplus-hospital-exterior-v2', 640)
+const hospitalPatientRoom = landscape('hospital-patient-room', 853)
+const hero = landscape('homepage-dr-amelia-consultation-v3', 720)
+const consultation = landscape('homepage-dr-emily-consultation-v2', 720)
+const remoteMonitoring = landscape('remote-patient-monitoring-v2', 720)
+const contactReception = landscape('contact-hospital-reception-v2', 720)
+const family = landscape('homepage-american-patients', 640)
+const corridor = landscape('hospital-exterior', 720)
+const team = landscape('professionals-team-hero-v2', 720)
+const logo = image(url('../assets/healer-health-care-logo-128.webp'), [], 128, 128)
+
+export const getImageMetadata = (src: string) => imageMetadata.get(src)
+
 export const images = {
-  logo: new URL('../assets/healer-health-care-logo.png', import.meta.url).href,
-  authSignup: new URL('../assets/auth-signup-young-female-doctor.png', import.meta.url).href,
-  authSignin: new URL('../assets/auth-signin-doctor-nurse.png', import.meta.url).href,
-  staffDoctorMichael: new URL('../assets/staff-doctor-michael-reed.png', import.meta.url).href,
-  staffDoctorAmelia: new URL('../assets/staff-doctor-amelia-brooks.png', import.meta.url).href,
-  staffNurseChloe: new URL('../assets/staff-nurse-chloe-adams.png', import.meta.url).href,
-  hospitalExterior: new URL('../assets/healerplus-hospital-exterior-v2.png', import.meta.url).href,
-  hospitalPatientRoom: new URL('../assets/hospital-patient-room.png', import.meta.url).href,
-  hero: new URL('../assets/homepage-dr-amelia-consultation-v3.png', import.meta.url).href,
-  consultation: new URL('../assets/homepage-dr-emily-consultation-v2.png', import.meta.url).href,
-  remoteMonitoring: new URL('../assets/remote-patient-monitoring-v2.png', import.meta.url).href,
-  contactReception: new URL('../assets/contact-hospital-reception-v2.png', import.meta.url).href,
-  family: new URL('../assets/homepage-american-patients.png', import.meta.url).href,
-  nurse: new URL('../assets/auth-signin-doctor-nurse.png', import.meta.url).href,
-  imaging: new URL('../assets/hospital-patient-room.png', import.meta.url).href,
-  corridor: new URL('../assets/hospital-exterior.png', import.meta.url).href,
-  reception: new URL('../assets/contact-hospital-reception-v2.png', import.meta.url).href,
-  patientRoom: new URL('../assets/hospital-patient-room.png', import.meta.url).href,
-  team: new URL('../assets/professionals-team-hero-v2.png', import.meta.url).href,
-  doctorMale: new URL('../assets/staff-doctor-michael-reed.png', import.meta.url).href,
-  doctorFemale: new URL('../assets/auth-signup-young-female-doctor.png', import.meta.url).href,
-  doctorCare: new URL('../assets/staff-nurse-chloe-adams.png', import.meta.url).href,
+  logo,
+  authSignup,
+  authSignin,
+  staffDoctorMichael,
+  staffDoctorAmelia,
+  staffNurseChloe,
+  hospitalExterior,
+  hospitalPatientRoom,
+  hero,
+  consultation,
+  remoteMonitoring,
+  contactReception,
+  family,
+  nurse: authSignin,
+  imaging: hospitalPatientRoom,
+  corridor,
+  reception: contactReception,
+  patientRoom: hospitalPatientRoom,
+  team,
+  doctorMale: staffDoctorMichael,
+  doctorFemale: authSignup,
+  doctorCare: staffNurseChloe,
 }
 
 export const services = [

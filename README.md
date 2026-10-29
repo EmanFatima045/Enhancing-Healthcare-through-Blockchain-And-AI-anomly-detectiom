@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/healerplus-readme-banner.png" alt="HealerPlus secure digital healthcare platform" width="100%" />
+<img src="docs/assets/healerplus-readme-banner-1086.webp" alt="HealerPlus secure digital healthcare platform" width="1086" height="362" />
 </p>
 
 <h1 align="center">HealerPlus</h1>
@@ -42,10 +42,10 @@ HealerPlus explores how modern web engineering, client-side cryptography, blockc
 <table>
   <tr>
     <td width="50%">
-      <img src="frontend/assets/homepage-dr-amelia-consultation-v3.png" alt="Doctor speaking with a patient in the HealerPlus interface" />
+<img src="frontend/assets/homepage-dr-amelia-consultation-v3-1280.webp" alt="Doctor speaking with a patient in the HealerPlus interface" width="1280" height="720" />
     </td>
     <td width="50%">
-      <img src="frontend/assets/healerplus-hospital-exterior-v2.png" alt="Modern hospital exterior used in the HealerPlus interface" />
+<img src="frontend/assets/healerplus-hospital-exterior-v2-1280.webp" alt="Modern hospital exterior used in the HealerPlus interface" width="1280" height="640" />
     </td>
   </tr>
   <tr>
@@ -96,8 +96,8 @@ The application is a modular monolith: one React SPA communicates with one FastA
 | Accounts, roles and revocable sessions | ✅ Implemented | Persisted with SQLAlchemy; authorization is rechecked on protected requests |
 | Appointment requests | ✅ Implemented | Requests persist but do not represent confirmed clinical availability |
 | Client-encrypted record storage | ✅ Implemented | The server stores ciphertext and wrapped keys, not plaintext records |
-| Local blockchain contracts | ✅ Implemented | Hardhat network only; deployment is restricted to chain ID `31337` |
-| Wallet consent verification | ⚙️ Configuration dependent | Requires the local node, deployed contracts and MetaMask |
+| Local blockchain contracts | ✅ Implemented | `run_all.bat` starts Hardhat and verifies/deploys all four contracts on chain `31337` |
+| Wallet consent verification | ✅ Local integration | Backend verifies deployed bytecode and receipts; user transactions still require MetaMask |
 | AI intrusion detection | 🧪 Development model | Trained from the checked-in 40-row demonstration dataset |
 | IoMT monitoring | 🧪 Simulated | No physical medical device is connected |
 | Federated learning | 🧪 Simulated | In-process FedAvg demonstration; no real hospitals or privacy guarantee |
@@ -177,6 +177,8 @@ On Windows, the simplest option is:
 .\run_all.bat
 ```
 
+The master launcher starts the Hardhat blockchain, verifies or deploys the four contracts, exports fresh addresses/ABIs, starts FastAPI and Vite, and opens the browser only after every layer reports ready.
+
 Or start each service manually in separate terminals:
 
 ```powershell
@@ -232,6 +234,16 @@ Run Alembic migrations before upgrading an existing deployment.
 7. Revocation blocks future API delivery but cannot erase information already downloaded by a recipient.
 
 Losing both the browser key and encrypted backup makes old records cryptographically unrecoverable. An Ethereum wallet is not a record-decryption key.
+
+## 🏥 Hospital administration panel
+
+Create the first administrator with the secure interactive helper:
+
+```powershell
+.\create_admin.bat
+```
+
+After signing in, a verified `HospitalAdmin` is routed to `/admin`. The protected operations workspace includes appointment review and doctor assignment, staff onboarding/approval/suspension, patient and staff listings, audit events, security incidents, operational counts, and live smart-contract bytecode status. Patient sessions receive `403 Forbidden` from every administration endpoint.
 
 ## ⛓️ Smart contracts
 
@@ -289,6 +301,7 @@ All application routes are prefixed with `/api/v1`.
 | `/security` | Event evaluation, restricted attack simulation, threat feed and model metrics |
 | `/iomt` | Simulated telemetry stream and inspection |
 | `/federated` | Simulation status and restricted training rounds |
+| `/admin` | Hospital overview, appointment review and audit events for `HospitalAdmin` only |
 
 Browse the live schema at <http://127.0.0.1:8000/docs> after starting the backend.
 
@@ -310,11 +323,11 @@ cd ../blockchain
 npm test
 ```
 
-Verified on 18 October 2026:
+Verified on 19 October 2026:
 
 | Check | Result |
 |---|---:|
-| Backend acceptance tests | ✅ 3 passed |
+| Backend acceptance tests | ✅ 4 passed |
 | Solidity authorization/security tests | ✅ 7 passed |
 | React production build | ✅ Completed |
 

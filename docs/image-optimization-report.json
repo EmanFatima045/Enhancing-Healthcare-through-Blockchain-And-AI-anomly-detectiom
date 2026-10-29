@@ -1,0 +1,257 @@
+{
+  "quality": 84,
+  "assets": [
+    {
+      "master": "frontend\\assets\\contact-hospital-reception-v2-1280.webp",
+      "master_bytes": 70642,
+      "variants": [
+        {
+          "path": "frontend\\assets\\contact-hospital-reception-v2-640.webp",
+          "width": 640,
+          "height": 360,
+          "bytes": 30356
+        },
+        {
+          "path": "frontend\\assets\\contact-hospital-reception-v2-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 49212
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\healerplus-hospital-exterior-v2-1280.webp",
+      "master_bytes": 154498,
+      "variants": [
+        {
+          "path": "frontend\\assets\\healerplus-hospital-exterior-v2-640.webp",
+          "width": 640,
+          "height": 320,
+          "bytes": 50148
+        },
+        {
+          "path": "frontend\\assets\\healerplus-hospital-exterior-v2-960.webp",
+          "width": 960,
+          "height": 480,
+          "bytes": 97100
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\homepage-american-patients-1280.webp",
+      "master_bytes": 66160,
+      "variants": [
+        {
+          "path": "frontend\\assets\\homepage-american-patients-640.webp",
+          "width": 640,
+          "height": 320,
+          "bytes": 27704
+        },
+        {
+          "path": "frontend\\assets\\homepage-american-patients-960.webp",
+          "width": 960,
+          "height": 480,
+          "bytes": 45204
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\homepage-dr-amelia-consultation-v3-1280.webp",
+      "master_bytes": 86792,
+      "variants": [
+        {
+          "path": "frontend\\assets\\homepage-dr-amelia-consultation-v3-640.webp",
+          "width": 640,
+          "height": 360,
+          "bytes": 34960
+        },
+        {
+          "path": "frontend\\assets\\homepage-dr-amelia-consultation-v3-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 61064
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\homepage-dr-emily-consultation-v2-1280.webp",
+      "master_bytes": 91136,
+      "variants": [
+        {
+          "path": "frontend\\assets\\homepage-dr-emily-consultation-v2-640.webp",
+          "width": 640,
+          "height": 360,
+          "bytes": 34710
+        },
+        {
+          "path": "frontend\\assets\\homepage-dr-emily-consultation-v2-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 61668
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\hospital-exterior-1280.webp",
+      "master_bytes": 174570,
+      "variants": [
+        {
+          "path": "frontend\\assets\\hospital-exterior-640.webp",
+          "width": 640,
+          "height": 360,
+          "bytes": 52950
+        },
+        {
+          "path": "frontend\\assets\\hospital-exterior-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 106386
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\hospital-patient-room-1280.webp",
+      "master_bytes": 85518,
+      "variants": [
+        {
+          "path": "frontend\\assets\\hospital-patient-room-640.webp",
+          "width": 640,
+          "height": 426,
+          "bytes": 30940
+        },
+        {
+          "path": "frontend\\assets\\hospital-patient-room-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 55658
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\professionals-team-hero-v2-1280.webp",
+      "master_bytes": 60890,
+      "variants": [
+        {
+          "path": "frontend\\assets\\professionals-team-hero-v2-640.webp",
+          "width": 640,
+          "height": 360,
+          "bytes": 26620
+        },
+        {
+          "path": "frontend\\assets\\professionals-team-hero-v2-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 42556
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\remote-patient-monitoring-v2-1280.webp",
+      "master_bytes": 80740,
+      "variants": [
+        {
+          "path": "frontend\\assets\\remote-patient-monitoring-v2-640.webp",
+          "width": 640,
+          "height": 360,
+          "bytes": 33340
+        },
+        {
+          "path": "frontend\\assets\\remote-patient-monitoring-v2-960.webp",
+          "width": 960,
+          "height": 540,
+          "bytes": 55930
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\auth-signin-doctor-nurse-1024.webp",
+      "master_bytes": 82704,
+      "variants": [
+        {
+          "path": "frontend\\assets\\auth-signin-doctor-nurse-480.webp",
+          "width": 480,
+          "height": 720,
+          "bytes": 31796
+        },
+        {
+          "path": "frontend\\assets\\auth-signin-doctor-nurse-800.webp",
+          "width": 800,
+          "height": 1200,
+          "bytes": 60358
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\auth-signup-young-female-doctor-1024.webp",
+      "master_bytes": 65312,
+      "variants": [
+        {
+          "path": "frontend\\assets\\auth-signup-young-female-doctor-480.webp",
+          "width": 480,
+          "height": 720,
+          "bytes": 26962
+        },
+        {
+          "path": "frontend\\assets\\auth-signup-young-female-doctor-800.webp",
+          "width": 800,
+          "height": 1200,
+          "bytes": 49448
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\staff-doctor-amelia-brooks-1024.webp",
+      "master_bytes": 68344,
+      "variants": [
+        {
+          "path": "frontend\\assets\\staff-doctor-amelia-brooks-480.webp",
+          "width": 480,
+          "height": 720,
+          "bytes": 25918
+        },
+        {
+          "path": "frontend\\assets\\staff-doctor-amelia-brooks-800.webp",
+          "width": 800,
+          "height": 1200,
+          "bytes": 49706
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\staff-doctor-michael-reed-1024.webp",
+      "master_bytes": 58204,
+      "variants": [
+        {
+          "path": "frontend\\assets\\staff-doctor-michael-reed-480.webp",
+          "width": 480,
+          "height": 720,
+          "bytes": 23254
+        },
+        {
+          "path": "frontend\\assets\\staff-doctor-michael-reed-800.webp",
+          "width": 800,
+          "height": 1200,
+          "bytes": 43460
+        }
+      ]
+    },
+    {
+      "master": "frontend\\assets\\staff-nurse-chloe-adams-1024.webp",
+      "master_bytes": 72500,
+      "variants": [
+        {
+          "path": "frontend\\assets\\staff-nurse-chloe-adams-480.webp",
+          "width": 480,
+          "height": 720,
+          "bytes": 27318
+        },
+        {
+          "path": "frontend\\assets\\staff-nurse-chloe-adams-800.webp",
+          "width": 800,
+          "height": 1200,
+          "bytes": 51034
+        }
+      ]
+    }
+  ]
+}
